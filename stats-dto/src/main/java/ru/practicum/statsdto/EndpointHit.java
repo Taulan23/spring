@@ -31,7 +31,7 @@ public class EndpointHit {
     private String ip;
     
     @NotNull(message = "Timestamp не может быть null")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("timestamp")
     private LocalDateTime timestamp;
 }

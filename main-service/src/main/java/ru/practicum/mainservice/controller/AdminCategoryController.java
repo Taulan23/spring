@@ -19,6 +19,9 @@ public class AdminCategoryController {
     
     @PostMapping
     public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody NewCategoryDto newCategoryDto) {
+        if (newCategoryDto == null) {
+            throw new RuntimeException("Request body cannot be null");
+        }
         CategoryDto categoryDto = categoryService.createCategory(newCategoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryDto);
     }
@@ -26,6 +29,9 @@ public class AdminCategoryController {
     @PatchMapping("/{catId}")
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long catId, 
                                                      @Valid @RequestBody CategoryDto categoryDto) {
+        if (categoryDto == null) {
+            throw new RuntimeException("Request body cannot be null");
+        }
         CategoryDto updatedCategory = categoryService.updateCategory(catId, categoryDto);
         return ResponseEntity.ok(updatedCategory);
     }

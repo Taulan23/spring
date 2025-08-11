@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
@@ -17,6 +17,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+  sql:
+    init:
+      mode: always
 
 stats-server:
   url: http://localhost:9090
@@ -29,3 +32,8 @@ management:
   endpoint:
     health:
       show-details: always
+
+logging:
+  level:
+    ru.practicum.mainservice: DEBUG
+    org.springframework.web: DEBUG

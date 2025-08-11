@@ -33,6 +33,10 @@ public class StatsClient {
     }
     
     public void hit(EndpointHit endpointHit) {
+        if (endpointHit == null) {
+            throw new RuntimeException("EndpointHit cannot be null");
+        }
+        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         
@@ -42,7 +46,15 @@ public class StatsClient {
     }
     
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if (start == null || end == null) {
+            throw new RuntimeException("Start and end dates cannot be null");
+        }
+        
+        if (start.isAfter(end)) {
+            throw new RuntimeException("Start date cannot be after end date");
+        }
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         
         StringBuilder urlBuilder = new StringBuilder(serverUrl + "/stats?");
         urlBuilder.append("start=").append(URLEncoder.encode(start.format(formatter), StandardCharsets.UTF_8));
@@ -51,12 +63,19 @@ public class StatsClient {
         
         if (uris != null && !uris.isEmpty()) {
             for (String uri : uris) {
-                urlBuilder.append("&uris=").append(URLEncoder.encode(uri, StandardCharsets.UTF_8));
+                if (uri != null && !uri.trim().isEmpty()) {
+                    urlBuilder.append("&uris=").append(URLEncoder.encode(uri, StandardCharsets.UTF_8));
+                }
             }
         }
         
         ResponseEntity<ViewStats[]> response = restTemplate.getForEntity(urlBuilder.toString(), ViewStats[].class);
         
-        return List.of(response.getBody());
+        ViewStats[] body = response.getBody();
+        if (body == null || body.length == 0) {
+            return List.of();
+        }
+        
+        return List.of(body);
     }
 }
