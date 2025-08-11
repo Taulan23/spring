@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  stats-db:
+    image: postgres:15
+    container_name: stats-db
+    environment:
+      POSTGRES_DB: stats_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+
+  main-db:
+    image: postgres:15
+    container_name: main-db
+    environment:
+      POSTGRES_DB: main_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - main-db-data:/var/lib/postgresql/data
+
+  stats-service:
+    build:
+      context: ./stats-service
+      dockerfile: Dockerfile
+    container_name: stats-service
+    ports:
+      - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+  main-service:
+    build:
+      context: ./main-service
+      dockerfile: Dockerfile
+    container_name: main-service
+    ports:
+      - "8081:8080"
+    depends_on:
+      - main-db
+      - stats-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://main-db:5432/main_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      STATS_SERVER_URL: http://stats-service:9090
+
+volumes:
+  stats-db-data:
+  main-db-data:
