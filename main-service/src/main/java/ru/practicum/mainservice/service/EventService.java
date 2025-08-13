@@ -262,14 +262,14 @@ public class EventService {
     
     private EventFullDto mapToFullDto(Event event) {
         return new EventFullDto(
-                String.valueOf(event.getId()),
+                event.getId(),
                 event.getAnnotation(),
-                new CategoryDto(String.valueOf(event.getCategory().getId()), event.getCategory().getName()),
+                new CategoryDto(event.getCategory().getId(), event.getCategory().getName()),
                 event.getConfirmedRequests(),
                 event.getCreatedOn(),
                 event.getDescription(),
                 event.getEventDate(),
-                new UserShortDto(String.valueOf(event.getInitiator().getId()), event.getInitiator().getName()),
+                new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
                 new LocationDto(event.getLocation().getLat(), event.getLocation().getLon()),
                 event.getPaid(),
                 event.getParticipantLimit(),
@@ -283,12 +283,12 @@ public class EventService {
     
     private EventShortDto mapToShortDto(Event event) {
         return new EventShortDto(
-                String.valueOf(event.getId()),
+                event.getId(),
                 event.getAnnotation(),
-                new CategoryDto(String.valueOf(event.getCategory().getId()), event.getCategory().getName()),
+                new CategoryDto(event.getCategory().getId(), event.getCategory().getName()),
                 event.getConfirmedRequests(),
                 event.getEventDate(),
-                new UserShortDto(String.valueOf(event.getInitiator().getId()), event.getInitiator().getName()),
+                new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
                 event.getPaid(),
                 event.getTitle(),
                 event.getViews()

@@ -100,6 +100,6 @@ public class CategoryService {
         if (category == null) {
             return null;
         }
-        return new CategoryDto(String.valueOf(category.getId()), category.getName());
+        return new CategoryDto(category.getId(), category.getName());
     }
 }

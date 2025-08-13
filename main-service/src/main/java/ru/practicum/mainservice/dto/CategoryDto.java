@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class CategoryDto {
     
     @JsonProperty("id")
-    private String id;
+    private Long id;
     
     @NotBlank(message = "Name не может быть пустым")
     @Size(min = 1, max = 50, message = "Name должно быть от 1 до 50 символов")
