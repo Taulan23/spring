@@ -1,6 +1,8 @@
 package ru.practicum.mainservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.NewCategoryDto;
@@ -8,15 +10,26 @@ import ru.practicum.mainservice.exception.CategoryAlreadyExistsException;
 import ru.practicum.mainservice.exception.CategoryNotFoundException;
 import ru.practicum.mainservice.model.Category;
 import ru.practicum.mainservice.repository.CategoryRepository;
+import ru.practicum.mainservice.repository.EventRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
     
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
+    
+    public List<CategoryDto> getCategories(int from, int size) {
+        Pageable pageable = PageRequest.of(from / size, size);
+        return categoryRepository.findAll(pageable).getContent().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
     
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
         if (newCategoryDto.getName() == null || newCategoryDto.getName().trim().isEmpty()) {
@@ -56,12 +69,24 @@ public class CategoryService {
         if (!categoryRepository.existsById(id)) {
             throw new CategoryNotFoundException("Category not found");
         }
+        
+        // Проверяем, нет ли событий с этой категорией
+        boolean hasEvents = eventRepository.findAll().stream()
+                .anyMatch(event -> event.getCategory().getId().equals(id));
+        
+        if (hasEvents) {
+            throw new IllegalStateException("Нельзя удалить категорию, связанную с событиями");
+        }
+        
         categoryRepository.deleteById(id);
     }
     
-    public List<CategoryDto> getAllCategories() {
-        return categoryRepository.findAll().stream()
+    public List<CategoryDto> getAllCategories(Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size);
+        return categoryRepository.findAll(pageable).stream()
+                .filter(category -> category != null)
                 .map(this::convertToDto)
+                .filter(dto -> dto != null)
                 .collect(Collectors.toList());
     }
     
@@ -72,6 +97,9 @@ public class CategoryService {
     }
     
     private CategoryDto convertToDto(Category category) {
-        return new CategoryDto(category.getId(), category.getName());
+        if (category == null) {
+            return null;
+        }
+        return new CategoryDto(String.valueOf(category.getId()), category.getName());
     }
 }

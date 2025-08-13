@@ -1,0 +1,17 @@
+{
+  "id": "ewm-main-service-environment",
+  "name": "EWM Main Service Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "enabled": true
+    },
+    {
+      "key": "statsUrl", 
+      "value": "http://localhost:9090",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

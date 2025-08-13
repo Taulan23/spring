@@ -1,11 +1,11 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   application:
     name: main-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/main_db
+    url: jdbc:postgresql://localhost:5433/main_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -19,10 +19,11 @@ spring:
         format_sql: true
   sql:
     init:
-      mode: always
+      mode: never
 
-stats-server:
-  url: http://localhost:9090
+stats:
+  server:
+    url: http://localhost:9090
 
 management:
   endpoints:

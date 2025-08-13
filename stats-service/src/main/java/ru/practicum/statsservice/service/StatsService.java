@@ -8,7 +8,7 @@ import ru.practicum.statsservice.model.EndpointHit;
 import ru.practicum.statsservice.repository.EndpointHitRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +47,7 @@ public class StatsService {
         }
         
         if (unique) {
-            return repository.getStatsUnique(start, end, uris);
+            return repository.getUniqueStats(start, end, uris);
         } else {
             return repository.getStats(start, end, uris);
         }

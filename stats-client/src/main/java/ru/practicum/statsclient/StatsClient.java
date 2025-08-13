@@ -1,6 +1,6 @@
 package ru.practicum.statsclient;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -19,17 +19,29 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
-@Component
-@RequiredArgsConstructor
 public class StatsClient {
     
     private final RestTemplate restTemplate;
-    
-    @Value("${stats-server.url:http://localhost:9090}")
     private String serverUrl;
+    
+    public StatsClient() {
+        this.restTemplate = new RestTemplate();
+        this.serverUrl = "http://localhost:9090";
+    }
     
     public StatsClient(RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
+        this.serverUrl = "http://localhost:9090";
+    }
+    
+    public StatsClient(String serverUrl) {
+        this.restTemplate = new RestTemplate();
+        this.serverUrl = serverUrl;
+    }
+    
+    public StatsClient(RestTemplateBuilder builder, String serverUrl) {
+        this.restTemplate = builder.build();
+        this.serverUrl = serverUrl;
     }
     
     public void hit(EndpointHit endpointHit) {
@@ -54,7 +66,7 @@ public class StatsClient {
             throw new RuntimeException("Start date cannot be after end date");
         }
         
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         
         StringBuilder urlBuilder = new StringBuilder(serverUrl + "/stats?");
         urlBuilder.append("start=").append(URLEncoder.encode(start.format(formatter), StandardCharsets.UTF_8));

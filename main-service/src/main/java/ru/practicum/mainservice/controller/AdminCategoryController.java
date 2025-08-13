@@ -9,6 +9,7 @@ import ru.practicum.mainservice.dto.NewCategoryDto;
 import ru.practicum.mainservice.service.CategoryService;
 
 import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/categories")
@@ -16,6 +17,13 @@ import jakarta.validation.Valid;
 public class AdminCategoryController {
     
     private final CategoryService categoryService;
+    
+    @GetMapping
+    public ResponseEntity<List<CategoryDto>> getCategories(@RequestParam(defaultValue = "0") int from,
+                                                          @RequestParam(defaultValue = "10") int size) {
+        List<CategoryDto> categories = categoryService.getCategories(from, size);
+        return ResponseEntity.ok(categories);
+    }
     
     @PostMapping
     public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody NewCategoryDto newCategoryDto) {

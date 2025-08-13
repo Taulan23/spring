@@ -6,6 +6,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import ru.practicum.mainservice.exception.CategoryAlreadyExistsException;
 import ru.practicum.mainservice.exception.CategoryNotFoundException;
 
@@ -32,6 +33,17 @@ public class GlobalExceptionHandler {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("status", "CONFLICT");
         errorResponse.put("reason", "Integrity constraint has been violated.");
+        errorResponse.put("message", ex.getMessage());
+        errorResponse.put("timestamp", LocalDateTime.now().toString());
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalStateException(IllegalStateException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("status", "CONFLICT");
+        errorResponse.put("reason", "For the requested operation the conditions are not met.");
         errorResponse.put("message", ex.getMessage());
         errorResponse.put("timestamp", LocalDateTime.now().toString());
         
@@ -73,6 +85,17 @@ public class GlobalExceptionHandler {
         errorResponse.put("status", "BAD_REQUEST");
         errorResponse.put("reason", "Incorrectly made request.");
         errorResponse.put("message", "Validation failed");
+        errorResponse.put("timestamp", LocalDateTime.now().toString());
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParameter(MissingServletRequestParameterException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("status", "BAD_REQUEST");
+        errorResponse.put("reason", "Incorrectly made request.");
+        errorResponse.put("message", ex.getMessage());
         errorResponse.put("timestamp", LocalDateTime.now().toString());
         
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
