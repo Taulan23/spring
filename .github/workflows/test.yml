@@ -43,11 +43,13 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
     
     - name: Run tests
-      run: mvn test
+      run: mvn test -Dspring.profiles.active=test
       env:
         SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/test_db
         SPRING_DATASOURCE_USERNAME: postgres
         SPRING_DATASOURCE_PASSWORD: postgres
+        SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+        SPRING_SQL_INIT_MODE: never
     
     - name: Build project
       run: mvn clean install -DskipTests

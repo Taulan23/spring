@@ -1,0 +1,35 @@
+server:
+  port: 8080
+  tomcat:
+    max-http-post-size: 10MB
+  max-http-header-size: 8192
+
+spring:
+  application:
+    name: main-service
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  datasource:
+    url: jdbc:postgresql://localhost:5433/main_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
+
+stats:
+  server:
+    url: http://localhost:9090

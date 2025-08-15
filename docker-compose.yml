@@ -54,6 +54,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       STATS_SERVER_URL: http://stats-service:9090
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
 
 volumes:
   stats-db-data:

@@ -35,14 +35,25 @@ jobs:
     
     - name: Build and start services
       run: |
+        export SPRING_PROFILES_ACTIVE=ci
         docker-compose build
         docker-compose up -d
     
     - name: Wait for services to be ready
       run: |
-        sleep 30
-        curl -f http://localhost:8081/actuator/health || exit 1
-        curl -f http://localhost:9090/actuator/health || exit 1
+        echo "Waiting for services to start..."
+        sleep 45
+        
+        # Проверяем логи для диагностики
+        echo "=== Main Service Logs ==="
+        docker-compose logs main-service | tail -10
+        
+        # Проверяем доступность сервисов
+        echo "Checking main service..."
+        timeout 120 bash -c 'until curl -f http://localhost:8081/categories 2>/dev/null; do echo "Waiting..."; sleep 5; done'
+        
+        echo "Checking stats service..."
+        timeout 120 bash -c 'until curl -f "http://localhost:9090/stats?start=2024-01-01T00:00:00&end=2024-12-31T23:59:59" 2>/dev/null; do echo "Waiting..."; sleep 5; done'
     
     - name: Run integration tests
       run: |
