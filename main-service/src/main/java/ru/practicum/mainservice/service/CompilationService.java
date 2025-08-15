@@ -13,6 +13,7 @@ import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.repository.CompilationRepository;
 import ru.practicum.mainservice.repository.EventRepository;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -85,6 +86,7 @@ public class CompilationService {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("id"));
         return compilationRepository.findAllByPinned(pinned, pageable)
                 .stream()
+                .filter(compilation -> compilation != null && compilation.getId() != null) // Фильтрация null подборок
                 .map(this::mapToCompilationDto)
                 .collect(Collectors.toList());
     }
@@ -99,15 +101,21 @@ public class CompilationService {
     }
     
     private CompilationDto mapToCompilationDto(Compilation compilation) {
+        if (compilation == null || compilation.getId() == null) {
+            throw new IllegalArgumentException("Compilation or Compilation.id cannot be null");
+        }
+        
         CompilationDto dto = new CompilationDto();
         dto.setId(String.valueOf(compilation.getId()));
-        dto.setTitle(compilation.getTitle());
-        dto.setPinned(compilation.getPinned());
+        dto.setTitle(compilation.getTitle() != null ? compilation.getTitle() : "");
+        dto.setPinned(compilation.getPinned() != null ? compilation.getPinned() : false);
         
-        List<EventShortDto> eventDtos = compilation.getEvents().stream()
-                .filter(event -> event != null && event.getId() != null) // Фильтрация null событий
-                .map(this::mapToEventShortDto)
-                .collect(Collectors.toList());
+        List<EventShortDto> eventDtos = compilation.getEvents() != null ? 
+                compilation.getEvents().stream()
+                    .filter(event -> event != null && event.getId() != null) // Фильтрация null событий
+                    .map(this::mapToEventShortDto)
+                    .collect(Collectors.toList()) : 
+                new ArrayList<>();
         dto.setEvents(eventDtos);
         
         return dto;
