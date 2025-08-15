@@ -19,4 +19,11 @@ public class EventRequestStatusUpdateRequest {
     
     @NotNull(message = "Статус не может быть null")
     private RequestStatus status;
+    
+    public void setStatus(RequestStatus status) {
+        if (status != null && status != RequestStatus.CONFIRMED && status != RequestStatus.REJECTED) {
+            throw new IllegalArgumentException("Можно установить только статус CONFIRMED или REJECTED");
+        }
+        this.status = status;
+    }
 }
