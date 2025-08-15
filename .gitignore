@@ -50,3 +50,4 @@ logs/
 ### Test Results ###
 newman-results.json
 *.json.results
+newman-detailed.json

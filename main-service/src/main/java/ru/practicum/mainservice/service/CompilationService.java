@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainservice.dto.*;
+import ru.practicum.mainservice.exception.CategoryNotFoundException;
 import ru.practicum.mainservice.model.Compilation;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.repository.CompilationRepository;
@@ -61,7 +62,7 @@ public class CompilationService {
         log.info("Updating compilation with id: {}", compId);
         
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new RuntimeException("Compilation not found with id: " + compId));
+                .orElseThrow(() -> new CategoryNotFoundException("Подборка не найдена"));
         
         if (updateRequest.getTitle() != null) {
             compilation.setTitle(updateRequest.getTitle());
@@ -95,7 +96,7 @@ public class CompilationService {
         log.info("Getting compilation by id: {}", compId);
         
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new RuntimeException("Compilation not found with id: " + compId));
+                .orElseThrow(() -> new CategoryNotFoundException("Подборка не найдена"));
         
         return mapToCompilationDto(compilation);
     }

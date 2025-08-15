@@ -1,0 +1,118 @@
+name: Postman API Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  postman-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+    - name: Build project
+      run: mvn clean package -DskipTests
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build and start services
+      run: |
+        docker-compose build
+        docker-compose up -d
+    
+    - name: Wait for services to be ready
+      run: |
+        echo "Waiting for services to start..."
+        sleep 30
+        
+        # Проверяем, что сервисы запустились
+        timeout 60 bash -c 'until curl -f http://localhost:8081/categories 2>/dev/null; do sleep 2; done'
+        timeout 60 bash -c 'until curl -f http://localhost:9090/stats?start=2024-01-01T00:00:00&end=2024-12-31T23:59:59 2>/dev/null; do sleep 2; done'
+        
+        echo "Services are ready!"
+    
+    - name: Install Newman
+      run: npm install -g newman
+    
+    - name: Run Main Service Postman Tests
+      run: |
+        echo "🧪 Запуск тестов Main Service..."
+        newman run ewm-main-service_test.json \
+          -e postman-environment.json \
+          --reporters cli,json \
+          --reporter-json-export main-service-results.json \
+          --timeout-request 10000 \
+          --delay-request 100
+    
+    - name: Run Stats Service Postman Tests  
+      run: |
+        echo "📊 Запуск тестов Stats Service..."
+        newman run ewm-stat-service_test.json \
+          -e postman-environment.json \
+          --reporters cli,json \
+          --reporter-json-export stats-service-results.json \
+          --timeout-request 10000 \
+          --delay-request 100
+    
+    - name: Verify test results
+      run: |
+        echo "📋 Проверка результатов тестов..."
+        
+        # Проверяем результаты main-service
+        if [ -f "main-service-results.json" ]; then
+          MAIN_ASSERTIONS=$(cat main-service-results.json | grep -o '"assertion":{"name":' | wc -l)
+          MAIN_FAILURES=$(cat main-service-results.json | grep -o '"failure":' | wc -l)
+          echo "🎯 Main Service: $MAIN_ASSERTIONS assertions, $MAIN_FAILURES failures"
+        fi
+        
+        # Проверяем результаты stats-service  
+        if [ -f "stats-service-results.json" ]; then
+          STATS_ASSERTIONS=$(cat stats-service-results.json | grep -o '"assertion":{"name":' | wc -l)
+          STATS_FAILURES=$(cat stats-service-results.json | grep -o '"failure":' | wc -l)
+          echo "📈 Stats Service: $STATS_ASSERTIONS assertions, $STATS_FAILURES failures"
+        fi
+        
+        echo "✅ Все тесты завершены!"
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: postman-test-results
+        path: |
+          main-service-results.json
+          stats-service-results.json
+        retention-days: 7
+    
+    - name: Upload service logs
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: docker-logs
+        path: |
+          docker-compose.logs
+        retention-days: 7
+    
+    - name: Stop services
+      if: always()
+      run: |
+        docker-compose logs > docker-compose.logs 2>&1 || true
+        docker-compose down -v
