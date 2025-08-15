@@ -15,8 +15,6 @@ import ru.practicum.mainservice.repository.EventRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor

@@ -31,13 +31,8 @@ public class CompilationService {
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
         log.info("Creating compilation with title: {}", newCompilationDto.getTitle());
         
-        // Проверяем title
-        if (newCompilationDto.getTitle() == null || newCompilationDto.getTitle().trim().isEmpty()) {
-            throw new RuntimeException("Название подборки не может быть пустым");
-        }
-        
         Compilation compilation = new Compilation();
-        compilation.setTitle(newCompilationDto.getTitle().trim());
+        compilation.setTitle(newCompilationDto.getTitle());
         compilation.setPinned(newCompilationDto.getPinned() != null ? newCompilationDto.getPinned() : false);
         
         Set<Event> events = new HashSet<>();
@@ -110,6 +105,7 @@ public class CompilationService {
         dto.setPinned(compilation.getPinned());
         
         List<EventShortDto> eventDtos = compilation.getEvents().stream()
+                .filter(event -> event != null && event.getId() != null) // Фильтрация null событий
                 .map(this::mapToEventShortDto)
                 .collect(Collectors.toList());
         dto.setEvents(eventDtos);
@@ -118,16 +114,27 @@ public class CompilationService {
     }
     
     private EventShortDto mapToEventShortDto(Event event) {
+        // Дополнительные проверки на null значения
+        if (event == null || event.getId() == null) {
+            throw new IllegalArgumentException("Event or Event.id cannot be null");
+        }
+        if (event.getCategory() == null || event.getCategory().getId() == null) {
+            throw new IllegalArgumentException("Event.category or Event.category.id cannot be null");
+        }
+        if (event.getInitiator() == null || event.getInitiator().getId() == null) {
+            throw new IllegalArgumentException("Event.initiator or Event.initiator.id cannot be null");
+        }
+        
         return new EventShortDto(
                 String.valueOf(event.getId()),
                 event.getAnnotation(),
                 new CategoryDto(String.valueOf(event.getCategory().getId()), event.getCategory().getName()),
-                event.getConfirmedRequests(),
+                event.getConfirmedRequests() != null ? event.getConfirmedRequests() : 0L,
                 event.getEventDate(),
                 new UserShortDto(String.valueOf(event.getInitiator().getId()), event.getInitiator().getName()),
-                event.getPaid(),
+                event.getPaid() != null ? event.getPaid() : false,
                 event.getTitle(),
-                event.getViews()
+                event.getViews() != null ? event.getViews() : 0L
         );
     }
     

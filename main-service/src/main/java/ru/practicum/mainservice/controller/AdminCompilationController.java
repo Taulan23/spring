@@ -9,6 +9,8 @@ import ru.practicum.mainservice.dto.NewCompilationDto;
 import ru.practicum.mainservice.dto.UpdateCompilationRequest;
 import ru.practicum.mainservice.service.CompilationService;
 
+import jakarta.validation.Valid;
+
 
 
 @RestController
@@ -19,7 +21,7 @@ public class AdminCompilationController {
     private final CompilationService compilationService;
     
     @PostMapping
-    public ResponseEntity<CompilationDto> createCompilation(@RequestBody NewCompilationDto newCompilationDto) {
+    public ResponseEntity<CompilationDto> createCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto) {
         CompilationDto compilation = compilationService.createCompilation(newCompilationDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(compilation);
     }
@@ -32,7 +34,7 @@ public class AdminCompilationController {
     
     @PatchMapping("/{compId}")
     public ResponseEntity<CompilationDto> updateCompilation(@PathVariable Long compId,
-                                                           @RequestBody UpdateCompilationRequest updateRequest) {
+                                                           @Valid @RequestBody UpdateCompilationRequest updateRequest) {
         CompilationDto compilation = compilationService.updateCompilation(compId, updateRequest);
         return ResponseEntity.ok(compilation);
     }
