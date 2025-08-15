@@ -3,6 +3,7 @@ package ru.practicum.mainservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.mainservice.dto.CategoryDto;
 import ru.practicum.mainservice.dto.NewCategoryDto;
@@ -25,7 +26,7 @@ public class CategoryService {
     private final EventRepository eventRepository;
     
     public List<CategoryDto> getCategories(int from, int size) {
-        Pageable pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("id"));
         return categoryRepository.findAll(pageable).getContent().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -82,7 +83,7 @@ public class CategoryService {
     }
     
     public List<CategoryDto> getAllCategories(Integer from, Integer size) {
-        Pageable pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("id"));
         return categoryRepository.findAll(pageable).stream()
                 .filter(category -> category != null)
                 .map(this::convertToDto)

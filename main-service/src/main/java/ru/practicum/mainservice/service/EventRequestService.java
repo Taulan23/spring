@@ -87,8 +87,18 @@ public class EventRequestService {
         return new ParticipationRequestDto(
                 request.getId(),
                 request.getCreated(),
-                request.getEvent().getId(),
-                request.getRequester().getId(),
+                new EventShortDto(
+                        String.valueOf(request.getEvent().getId()),
+                        request.getEvent().getAnnotation(),
+                        new CategoryDto(String.valueOf(request.getEvent().getCategory().getId()), request.getEvent().getCategory().getName()),
+                        request.getEvent().getConfirmedRequests(),
+                        request.getEvent().getEventDate(),
+                        new UserShortDto(String.valueOf(request.getEvent().getInitiator().getId()), request.getEvent().getInitiator().getName()),
+                        request.getEvent().getPaid(),
+                        request.getEvent().getTitle(),
+                        request.getEvent().getViews()
+                ),
+                new UserShortDto(String.valueOf(request.getRequester().getId()), request.getRequester().getName()),
                 request.getStatus()
         );
     }
