@@ -1,13 +1,13 @@
 -- Вставка тестовых данных
 
 -- Категории
-INSERT INTO categories (id, name) VALUES (1, 'Концерты') ON CONFLICT (name) DO NOTHING;
-INSERT INTO categories (id, name) VALUES (2, 'Выставки') ON CONFLICT (name) DO NOTHING;
-INSERT INTO categories (id, name) VALUES (3, 'Спорт') ON CONFLICT (name) DO NOTHING;
+INSERT INTO categories (id, name) VALUES (1, 'Концерты') ON CONFLICT (id) DO NOTHING;
+INSERT INTO categories (id, name) VALUES (2, 'Выставки') ON CONFLICT (id) DO NOTHING;
+INSERT INTO categories (id, name) VALUES (3, 'Спорт') ON CONFLICT (id) DO NOTHING;
 
 -- Пользователи
-INSERT INTO users (id, name, email) VALUES (1, 'Иван Иванов', 'ivan@example.com') ON CONFLICT (email) DO NOTHING;
-INSERT INTO users (id, name, email) VALUES (2, 'Мария Петрова', 'maria@example.com') ON CONFLICT (email) DO NOTHING;
+INSERT INTO users (id, name, email) VALUES (1, 'Иван Иванов', 'ivan@example.com') ON CONFLICT (id) DO NOTHING;
+INSERT INTO users (id, name, email) VALUES (2, 'Мария Петрова', 'maria@example.com') ON CONFLICT (id) DO NOTHING;
 
 -- События
 INSERT INTO events (id, annotation, category_id, confirmed_requests, created_on, description, event_date, initiator_id, lat, lon, paid, participant_limit, published_on, request_moderation, state, title, views) 
@@ -47,9 +47,9 @@ INSERT INTO compilations (id, title, pinned) VALUES (1, 'Лучшие событ
 INSERT INTO compilations (id, title, pinned) VALUES (2, 'Культурные мероприятия', false) ON CONFLICT (id) DO NOTHING;
 
 -- Связи подборок с событиями
-INSERT INTO compilation_events (compilation_id, event_id) VALUES (1, 1) ON CONFLICT DO NOTHING;
-INSERT INTO compilation_events (compilation_id, event_id) VALUES (1, 2) ON CONFLICT DO NOTHING;
-INSERT INTO compilation_events (compilation_id, event_id) VALUES (2, 1) ON CONFLICT DO NOTHING;
+INSERT INTO compilation_events (compilation_id, event_id) VALUES (1, 1) ON CONFLICT (compilation_id, event_id) DO NOTHING;
+INSERT INTO compilation_events (compilation_id, event_id) VALUES (1, 2) ON CONFLICT (compilation_id, event_id) DO NOTHING;
+INSERT INTO compilation_events (compilation_id, event_id) VALUES (2, 1) ON CONFLICT (compilation_id, event_id) DO NOTHING;
 
 -- Обновление последовательностей для корректного автоинкремента
 SELECT setval('categories_id_seq', COALESCE((SELECT MAX(id) FROM categories), 0) + 1, false);
