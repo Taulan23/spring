@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainservice.dto.*;
@@ -46,6 +47,7 @@ public class CompilationService {
         compilation.setEvents(events);
         
         Compilation savedCompilation = compilationRepository.save(compilation);
+        compilationRepository.flush(); // Принудительная синхронизация с базой данных
         return mapToCompilationDto(savedCompilation);
     }
     
@@ -85,7 +87,7 @@ public class CompilationService {
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         log.info("Getting compilations with pinned: {}, from: {}, size: {}", pinned, from, size);
         
-        Pageable pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("id"));
         return compilationRepository.findAllByPinned(pinned, pageable)
                 .stream()
                 .map(this::mapToCompilationDto)
@@ -116,30 +118,18 @@ public class CompilationService {
     }
     
     private EventShortDto mapToEventShortDto(Event event) {
-        EventShortDto dto = new EventShortDto();
-        dto.setId(String.valueOf(event.getId()));
-        dto.setAnnotation(event.getAnnotation());
-        dto.setCategory(mapToCategoryDto(event.getCategory()));
-        dto.setConfirmedRequests(event.getConfirmedRequests());
-        dto.setEventDate(event.getEventDate());
-        dto.setInitiator(mapToUserShortDto(event.getInitiator()));
-        dto.setPaid(event.getPaid());
-        dto.setTitle(event.getTitle());
-        dto.setViews(event.getViews());
-        return dto;
+        return new EventShortDto(
+                String.valueOf(event.getId()),
+                event.getAnnotation(),
+                new CategoryDto(String.valueOf(event.getCategory().getId()), event.getCategory().getName()),
+                event.getConfirmedRequests(),
+                event.getEventDate(),
+                new UserShortDto(String.valueOf(event.getInitiator().getId()), event.getInitiator().getName()),
+                event.getPaid(),
+                event.getTitle(),
+                event.getViews()
+        );
     }
     
-    private CategoryDto mapToCategoryDto(ru.practicum.mainservice.model.Category category) {
-        CategoryDto dto = new CategoryDto();
-        dto.setId(String.valueOf(category.getId()));
-        dto.setName(category.getName());
-        return dto;
-    }
-    
-    private UserShortDto mapToUserShortDto(ru.practicum.mainservice.model.User user) {
-        UserShortDto dto = new UserShortDto();
-        dto.setId(String.valueOf(user.getId()));
-        dto.setName(user.getName());
-        return dto;
-    }
+
 }
