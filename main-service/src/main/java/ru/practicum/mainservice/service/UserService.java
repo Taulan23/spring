@@ -62,6 +62,6 @@ public class UserService {
     }
     
     private UserDto mapToDto(User user) {
-        return new UserDto(user.getId(), user.getName(), user.getEmail());
+        return new UserDto(String.valueOf(user.getId()), user.getName(), user.getEmail());
     }
 }

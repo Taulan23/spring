@@ -103,7 +103,7 @@ public class CompilationService {
     
     private CompilationDto mapToCompilationDto(Compilation compilation) {
         CompilationDto dto = new CompilationDto();
-        dto.setId(compilation.getId());
+        dto.setId(String.valueOf(compilation.getId()));
         dto.setTitle(compilation.getTitle());
         dto.setPinned(compilation.getPinned());
         
@@ -117,7 +117,7 @@ public class CompilationService {
     
     private EventShortDto mapToEventShortDto(Event event) {
         EventShortDto dto = new EventShortDto();
-        dto.setId(event.getId());
+        dto.setId(String.valueOf(event.getId()));
         dto.setAnnotation(event.getAnnotation());
         dto.setCategory(mapToCategoryDto(event.getCategory()));
         dto.setConfirmedRequests(event.getConfirmedRequests());
@@ -131,14 +131,14 @@ public class CompilationService {
     
     private CategoryDto mapToCategoryDto(ru.practicum.mainservice.model.Category category) {
         CategoryDto dto = new CategoryDto();
-        dto.setId(category.getId());
+        dto.setId(String.valueOf(category.getId()));
         dto.setName(category.getName());
         return dto;
     }
     
     private UserShortDto mapToUserShortDto(ru.practicum.mainservice.model.User user) {
         UserShortDto dto = new UserShortDto();
-        dto.setId(user.getId());
+        dto.setId(String.valueOf(user.getId()));
         dto.setName(user.getName());
         return dto;
     }

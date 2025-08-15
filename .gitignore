@@ -46,3 +46,7 @@ logs/
 ### Database ###
 *.db
 *.sqlite
+
+### Test Results ###
+newman-results.json
+*.json.results

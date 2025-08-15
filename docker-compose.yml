@@ -27,7 +27,7 @@ services:
 
   stats-service:
     build:
-      context: ./stats-service
+      context: ./stat-service/stats-service
       dockerfile: Dockerfile
     container_name: stats-service
     ports:

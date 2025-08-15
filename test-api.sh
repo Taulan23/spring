@@ -95,8 +95,14 @@ CATEGORY_HTTP_CODE="${CATEGORY_RESPONSE: -3}"
 if [ "$CATEGORY_HTTP_CODE" = "201" ]; then
     echo -e "${GREEN}✅ ПРОШЕЛ${NC}"
     PASSED_TESTS=$((PASSED_TESTS + 1))
-    CATEGORY_TO_DELETE=$(cat /tmp/category_response.json | grep -o '"id":"[0-9]*"' | grep -o '[0-9]*')
-    test_endpoint "Удаление категории" "DELETE" "http://localhost:8081/admin/categories/$CATEGORY_TO_DELETE" "" "204"
+    CATEGORY_TO_DELETE=$(cat /tmp/category_response.json | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+    if [ -n "$CATEGORY_TO_DELETE" ]; then
+        test_endpoint "Удаление категории" "DELETE" "http://localhost:8081/admin/categories/$CATEGORY_TO_DELETE" "" "204"
+    else
+        echo -e "${RED}❌ ПРОВАЛЕН${NC} (не удалось получить ID категории)"
+        FAILED_TESTS=$((FAILED_TESTS + 1))
+        TOTAL_TESTS=$((TOTAL_TESTS + 1))
+    fi
 else
     echo -e "${RED}❌ ПРОВАЛЕН${NC} (ожидался 201, получен $CATEGORY_HTTP_CODE)"
     FAILED_TESTS=$((FAILED_TESTS + 1))
