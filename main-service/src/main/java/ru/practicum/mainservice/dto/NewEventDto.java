@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.*;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 
 @Data
@@ -29,6 +30,7 @@ public class NewEventDto {
     private LocalDateTime eventDate;
     
     @NotNull(message = "Локация не может быть null")
+    @Valid
     private LocationDto location;
     
     private Boolean paid = false;

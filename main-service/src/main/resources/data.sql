@@ -51,8 +51,8 @@ INSERT INTO compilation_events (compilation_id, event_id) VALUES (1, 1) ON CONFL
 INSERT INTO compilation_events (compilation_id, event_id) VALUES (1, 2) ON CONFLICT DO NOTHING;
 INSERT INTO compilation_events (compilation_id, event_id) VALUES (2, 1) ON CONFLICT DO NOTHING;
 
--- Обновление последовательностей
-SELECT setval('categories_id_seq', (SELECT MAX(id) FROM categories));
-SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
-SELECT setval('events_id_seq', (SELECT MAX(id) FROM events));
-SELECT setval('compilations_id_seq', (SELECT MAX(id) FROM compilations));
+-- Обновление последовательностей для корректного автоинкремента
+SELECT setval('categories_id_seq', COALESCE((SELECT MAX(id) FROM categories), 0) + 1, false);
+SELECT setval('users_id_seq', COALESCE((SELECT MAX(id) FROM users), 0) + 1, false);
+SELECT setval('events_id_seq', COALESCE((SELECT MAX(id) FROM events), 0) + 1, false);
+SELECT setval('compilations_id_seq', COALESCE((SELECT MAX(id) FROM compilations), 0) + 1, false);

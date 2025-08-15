@@ -19,7 +19,8 @@ spring:
         format_sql: true
   sql:
     init:
-      mode: never
+      mode: always
+      data-locations: classpath:data.sql
 
 stats:
   server:

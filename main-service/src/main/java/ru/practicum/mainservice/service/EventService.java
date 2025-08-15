@@ -65,9 +65,9 @@ public class EventService {
         event.setEventDate(newEventDto.getEventDate());
         event.setInitiator(user);
         event.setLocation(new Location(newEventDto.getLocation().getLat(), newEventDto.getLocation().getLon()));
-        event.setPaid(newEventDto.getPaid());
-        event.setParticipantLimit(newEventDto.getParticipantLimit());
-        event.setRequestModeration(newEventDto.getRequestModeration());
+        event.setPaid(newEventDto.getPaid() != null ? newEventDto.getPaid() : false);
+        event.setParticipantLimit(newEventDto.getParticipantLimit() != null ? newEventDto.getParticipantLimit() : 0);
+        event.setRequestModeration(newEventDto.getRequestModeration() != null ? newEventDto.getRequestModeration() : true);
         event.setTitle(newEventDto.getTitle());
         event.setCreatedOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
